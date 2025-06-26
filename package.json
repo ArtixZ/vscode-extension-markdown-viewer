@@ -1,8 +1,8 @@
 {
     "name": "enhanced-md-editor",
-    "displayName": "Enhanced Markdown Editor & Viewer",
-    "description": "Enhanced markdown editor with split-screen preview, syntax highlighting, and resizable panels",
-    "version": "0.0.1",
+    "displayName": "Simply Markdown Viewer",
+    "description": "Enhanced markdown editor and viewer with split-screen preview, syntax highlighting, and resizable panels",
+    "version": "0.0.2",
     "publisher": "MarkdownViewer",
     "engines": {
         "vscode": "^1.74.0"

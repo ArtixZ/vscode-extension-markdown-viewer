@@ -51,6 +51,42 @@ export class MarkdownPreviewProvider
                 return `<table>\n<thead>\n${header}</thead>\n<tbody>\n${body}</tbody>\n</table>\n`;
             };
 
+            // Custom image renderer for proper webview URI handling
+            renderer.image = (
+                href: string,
+                title: string | null,
+                text: string
+            ) => {
+                let imageSrc = href;
+
+                // Handle local image paths
+                if (
+                    !href.startsWith("http://") &&
+                    !href.startsWith("https://") &&
+                    !href.startsWith("data:")
+                ) {
+                    try {
+                        const documentDir = vscode.Uri.file(
+                            document.uri.fsPath
+                        ).with({
+                            path: vscode.Uri.file(document.uri.fsPath)
+                                .path.split("/")
+                                .slice(0, -1)
+                                .join("/"),
+                        });
+                        const imageUri = vscode.Uri.joinPath(documentDir, href);
+                        imageSrc = webviewPanel.webview
+                            .asWebviewUri(imageUri)
+                            .toString();
+                    } catch (error) {
+                        console.error("Error resolving image path:", error);
+                    }
+                }
+
+                const titleAttr = title ? ` title="${title}"` : "";
+                return `<img src="${imageSrc}" alt="${text}"${titleAttr} style="max-width: 100%; height: auto;">`;
+            };
+
             const html = marked(document.getText(), { renderer });
 
             webviewPanel.webview.postMessage({
@@ -293,6 +329,22 @@ export class MarkdownPreviewProvider
                 }
                 
                 /* Remove the old resizer styles */
+                
+                /* Image styling */
+                img {
+                    max-width: 100%;
+                    height: auto;
+                    border-radius: 4px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    margin: 16px 0;
+                    display: block;
+                }
+                
+                /* Center images by default */
+                p img {
+                    display: block;
+                    margin: 16px auto;
+                }
                 
                 /* Markdown styling */
                 h1, h2, h3, h4, h5, h6 {
